@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:suitmedia_test/ui/provider/name/name_state_provider.dart';
 
 class FirstScreen extends ConsumerStatefulWidget {
   static const routePath = "/first-screen";
@@ -45,6 +46,11 @@ class _FirstScreenState extends ConsumerState<FirstScreen> {
                 ],
               ));
     }
+  }
+
+  void goToNextPage() {
+    ref.read(nameProvider.notifier).state = _nameController!.text;
+    Navigator.pushNamed(context, "/second-screen");
   }
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -106,7 +112,7 @@ class _FirstScreenState extends ConsumerState<FirstScreen> {
             const SizedBox(
               height: 16,
             ),
-            _buildButton(context, label: "Next", onPressed: () {}),
+            _buildButton(context, label: "Next", onPressed: goToNextPage),
           ],
         ),
       ),
