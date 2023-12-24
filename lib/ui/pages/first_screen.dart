@@ -12,7 +12,7 @@ class FirstScreen extends ConsumerStatefulWidget {
 
 class _FirstScreenState extends ConsumerState<FirstScreen> {
   bool isPalindrome(String input) {
-    final text = input.toLowerCase();
+    final text = input.toLowerCase().replaceAll(" ", "");
     final textLength = text.length;
     for (int i = 0; i < textLength / 2; i++) {
       if (text[i] != text[textLength - i - 1]) {
@@ -123,6 +123,9 @@ class _FirstScreenState extends ConsumerState<FirstScreen> {
       {required String label, TextEditingController? controller}) {
     return TextFormField(
       controller: controller,
+      onChanged: (value) {
+        isPalindrome(value);
+      },
       decoration: InputDecoration(
           hintText: label,
           hintStyle: const TextStyle(color: Colors.grey),
