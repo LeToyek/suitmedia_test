@@ -16,9 +16,23 @@ const MaterialColor textSwatch = MaterialColor(_textColor, <int, Color>{
   900: Color(0xFF0F172A),
 });
 
+const Color primaryColor = Color(0xFF2B637B);
+const Color errorColor = Color(0xFFDC2626); // red-600
+
 final lightTheme = ThemeData(
     primarySwatch: Colors.blue,
     primaryColor: const Color(0xFF2B637B),
+    colorScheme: ColorScheme.light(
+        primary: primaryColor,
+        secondary: primaryColor,
+        onSecondary: Colors.white,
+        error: errorColor,
+        background: textSwatch.shade200,
+        onBackground: textSwatch.shade500,
+        onSurface: textSwatch.shade500,
+        surface: textSwatch.shade50,
+        surfaceVariant: Colors.white,
+        shadow: textSwatch.shade900.withOpacity(.1)),
     fontFamily: GoogleFonts.nunito().fontFamily,
     textTheme: TextTheme(
       displayLarge: GoogleFonts.nunito(
