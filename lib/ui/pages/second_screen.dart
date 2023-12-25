@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:suitmedia_test/ui/pages/third_screen.dart';
 import 'package:suitmedia_test/ui/provider/name/name_state_provider.dart';
+import 'package:suitmedia_test/ui/provider/users/user_state_provider.dart';
 import 'package:suitmedia_test/ui/widgets/my_app_bar.dart';
 
 class SecondScreen extends ConsumerWidget {
@@ -10,6 +12,7 @@ class SecondScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final nameRef = ref.watch(nameProvider);
+    final userRef = ref.watch(userStateProvider);
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
@@ -34,14 +37,16 @@ class SecondScreen extends ConsumerWidget {
             const Spacer(),
             Center(
               child: Text(
-                "Selected User Name",
+                userRef != null
+                    ? "${userRef.firstName} ${userRef.lastName}"
+                    : "Selected User Name",
                 style: textTheme.headlineLarge!.apply(fontWeightDelta: 2),
               ),
             ),
             const Spacer(),
             InkWell(
               onTap: () {
-                Navigator.pushNamed(context, "/third-screen");
+                Navigator.pushReplacementNamed(context, ThirdScreen.routePath);
               },
               child: Container(
                   width: double.infinity,

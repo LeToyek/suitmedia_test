@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-AppBar myAppBar(BuildContext context, String title) {
+AppBar myAppBar(BuildContext context, String title, {void Function()? action}) {
   return AppBar(
     backgroundColor: Colors.white,
     bottom: PreferredSize(
@@ -11,9 +11,10 @@ AppBar myAppBar(BuildContext context, String title) {
       ),
     ),
     leading: IconButton(
-      onPressed: () {
-        Navigator.pop(context);
-      },
+      onPressed: action ??
+          () {
+            Navigator.pop(context);
+          },
       icon: const Icon(
         Icons.arrow_back_ios_new,
         color: Color(0xFF554AF0),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:suitmedia_test/ui/pages/second_screen.dart';
 import 'package:suitmedia_test/ui/provider/users/user_state_notifier_provider.dart';
 import 'package:suitmedia_test/ui/widgets/my_app_bar.dart';
 import 'package:suitmedia_test/ui/widgets/user_card.dart';
@@ -44,7 +45,9 @@ class _ThirdScreenState extends ConsumerState<ThirdScreen> {
   Widget build(BuildContext context) {
     final userNotifierRef = ref.watch(userNotifierProvider);
     return Scaffold(
-        appBar: myAppBar(context, "Third Screen"),
+        appBar: myAppBar(context, "Third Screen",
+            action: () => Navigator.pushReplacementNamed(
+                context, SecondScreen.routePath)),
         backgroundColor: Colors.white,
         body: userNotifierRef.when(
             data: (data) {
