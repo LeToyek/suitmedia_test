@@ -9,7 +9,6 @@ class UserModel with _$UserModel {
 
   const factory UserModel({
     int? id,
-    String? name,
     String? email,
     @JsonKey(name: "first_name") String? firstName,
     @JsonKey(name: "last_name") String? lastName,

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:suitmedia_test/helper/char_corrector.dart';
+import 'package:suitmedia_test/ui/pages/second_screen.dart';
 import 'package:suitmedia_test/ui/provider/name/name_state_provider.dart';
+import 'package:suitmedia_test/ui/provider/users/user_state_provider.dart';
 import 'package:suitmedia_test/ui/widgets/base_alert_dialog.dart';
 import 'package:suitmedia_test/ui/widgets/base_button_bar.dart';
 import 'package:suitmedia_test/ui/widgets/base_text_field.dart';
@@ -17,7 +20,7 @@ class _FirstScreenState extends ConsumerState<FirstScreen> {
   late final GlobalKey<ScaffoldMessengerState> smState;
 
   bool checkEmptyField(String input, String label) {
-    if (input.isEmpty) {
+    if (input.trim().isEmpty) {
       smState.currentState!.showSnackBar(SnackBar(
         backgroundColor: Colors.red,
         content: Text(label),
@@ -56,12 +59,13 @@ class _FirstScreenState extends ConsumerState<FirstScreen> {
   }
 
   void goToNextPage() {
-    final nameText = _nameController!.text.replaceAll(" ", "");
+    final nameText = removeSpacesAtEdges(_nameController!.text);
     if (!checkEmptyField(nameText, "fill the name")) {
       return;
     }
     ref.read(nameProvider.notifier).state = nameText;
-    Navigator.pushNamed(context, "/second-screen");
+    ref.read(userStateProvider.notifier).state = null;
+    Navigator.pushNamed(context, SecondScreen.routePath);
   }
 
   TextEditingController? _nameController;
@@ -82,6 +86,8 @@ class _FirstScreenState extends ConsumerState<FirstScreen> {
     super.dispose();
     _nameController?.dispose();
     _palindromeController?.dispose();
+    smState.currentState?.deactivate();
+    smState.currentState?.removeCurrentSnackBar();
     smState.currentState?.dispose();
   }
 

@@ -34,65 +34,72 @@ class _ThirdScreenState extends ConsumerState<ThirdScreen> {
   @override
   Widget build(BuildContext context) {
     final userNotifierRef = ref.watch(userNotifierProvider);
-    return Scaffold(
-        appBar: myAppBar(context, "Third Screen",
-            action: () => Navigator.pushReplacementNamed(
-                context, SecondScreen.routePath)),
-        backgroundColor: Colors.white,
-        body: userNotifierRef.when(
-            data: (data) {
-              if (data.isEmpty) {
-                return const Center(
-                  child: Text("No Data"),
-                );
-              } else {
-                final isExists =
-                    ref.read(userNotifierProvider.notifier).isExist;
-                return _refreshWrapper(
-                  isScroll: false,
-                  child: NotificationListener<ScrollNotification>(
-                    onNotification: _onEndScroll,
-                    child: SingleChildScrollView(
-                      controller: _scrollController,
-                      physics: const BouncingScrollPhysics(),
-                      child: Column(
-                        children: [
-                          ListView.builder(
-                            padding: const EdgeInsets.all(16),
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) {
-                              final user = data[index];
-                              return UserCard(user: user);
-                            },
-                            itemCount: data.length,
-                          ),
-                          isExists
-                              ? Container(
-                                  padding: const EdgeInsets.all(16),
-                                  alignment: Alignment.center,
-                                  child: const CircularProgressIndicator(),
-                                )
-                              : Container()
-                        ],
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (didPop) return;
+        Navigator.pushReplacementNamed(context, SecondScreen.routePath);
+      },
+      child: Scaffold(
+          appBar: myAppBar(context, "Third Screen",
+              action: () => Navigator.pushReplacementNamed(
+                  context, SecondScreen.routePath)),
+          backgroundColor: Colors.white,
+          body: userNotifierRef.when(
+              data: (data) {
+                if (data.isEmpty) {
+                  return const Center(
+                    child: Text("No Data"),
+                  );
+                } else {
+                  final isExists =
+                      ref.read(userNotifierProvider.notifier).isExist;
+                  return _refreshWrapper(
+                    isScroll: false,
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: _onEndScroll,
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
+                        physics: const BouncingScrollPhysics(),
+                        child: Column(
+                          children: [
+                            ListView.builder(
+                              padding: const EdgeInsets.all(16),
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                final user = data[index];
+                                return UserCard(user: user);
+                              },
+                              itemCount: data.length,
+                            ),
+                            isExists
+                                ? Container(
+                                    padding: const EdgeInsets.all(16),
+                                    alignment: Alignment.center,
+                                    child: const CircularProgressIndicator(),
+                                  )
+                                : Container()
+                          ],
+                        ),
                       ),
                     ),
+                  );
+                }
+              },
+              error: (e, s) {
+                return _refreshWrapper(
+                  child: Center(
+                    child: Text("Error => $e"),
                   ),
                 );
-              }
-            },
-            error: (e, s) {
-              return _refreshWrapper(
-                child: Center(
-                  child: Text("Error => $e"),
-                ),
-              );
-            },
-            loading: () => _refreshWrapper(
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                )));
+              },
+              loading: () => _refreshWrapper(
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ))),
+    );
   }
 
   Widget _refreshWrapper({required Widget child, bool isScroll = true}) {

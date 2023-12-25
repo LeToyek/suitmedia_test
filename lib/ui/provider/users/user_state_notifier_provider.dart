@@ -24,6 +24,17 @@ class UserNotifier extends StateNotifier<AsyncValue<List<UserModel>>> {
       state = AsyncValue.data(users);
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current);
+      if (e is DioException) {
+        String message = "";
+        switch (e.type) {
+          case DioExceptionType.connectionError:
+            message = "No Internet Connection";
+            break;
+          default:
+            message = "Something went wrong";
+        }
+        state = AsyncValue.error(message, StackTrace.current);
+      }
     }
   }
 
