@@ -40,6 +40,9 @@ class SecondScreen extends ConsumerWidget {
             ),
             const Spacer(),
             InkWell(
+              onTap: () {
+                Navigator.pushNamed(context, "/third-screen");
+              },
               child: Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
