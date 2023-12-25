@@ -1,16 +1,27 @@
 # suitmedia_test
 
-A new Flutter project.
+Flutter Project for Suitmedia Test
 
-## Getting Started
+## Screens
 
-This project is a starting point for a Flutter application.
+|  first_screen | second_screen | third_screen |
+| --- | --- | --- |
+| ![Screenshot](docs/first_screen.jpg) | ![Screenshot](docs/second_screen.jpg) | ![Screenshot](docs/third_screen.jpg) |
 
-A few resources to get you started if this is your first Flutter project:
+## Preview
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+![Screenshot](docs/demonstration.gif)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## How to Run
+
+1. Clone this repository
+2. Open the project with Android Studio or VSCode
+3. Run `flutter pub get`
+4. Run `flutter run`
+5. Enjoy!
+
+## Notes
+
+You can download app-release.apk to try the app directly on your android device.
+
+
