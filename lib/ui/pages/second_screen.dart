@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:suitmedia_test/ui/pages/third_screen.dart';
 import 'package:suitmedia_test/ui/provider/name/name_state_provider.dart';
 import 'package:suitmedia_test/ui/provider/users/user_state_provider.dart';
+import 'package:suitmedia_test/ui/widgets/base_button_bar.dart';
 import 'package:suitmedia_test/ui/widgets/my_app_bar.dart';
 
 class SecondScreen extends ConsumerWidget {
@@ -14,7 +15,6 @@ class SecondScreen extends ConsumerWidget {
     final nameRef = ref.watch(nameProvider);
     final userRef = ref.watch(userStateProvider);
     final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: myAppBar(context, "Second Screen"),
       backgroundColor: Colors.white,
@@ -44,23 +44,10 @@ class SecondScreen extends ConsumerWidget {
               ),
             ),
             const Spacer(),
-            InkWell(
-              onTap: () {
-                Navigator.pushReplacementNamed(context, ThirdScreen.routePath);
-              },
-              child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                      color: colorScheme.primary,
-                      borderRadius: BorderRadius.circular(16)),
-                  child: Center(
-                    child: Text(
-                      "Choose a User",
-                      style: textTheme.bodyLarge!
-                          .apply(color: Colors.white, fontWeightDelta: 2),
-                    ),
-                  )),
+            BaseButtonBar(
+              label: "Choose a User",
+              onPressed: () => Navigator.pushReplacementNamed(
+                  context, ThirdScreen.routePath),
             )
           ],
         ),

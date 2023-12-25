@@ -34,6 +34,12 @@ final lightTheme = ThemeData(
         surfaceVariant: Colors.white,
         shadow: textSwatch.shade900.withOpacity(.1)),
     fontFamily: GoogleFonts.nunito().fontFamily,
+    fontFamilyFallback: const <String>[
+      "Nunito",
+      "Roboto",
+      "Arial",
+      "sans-serif"
+    ],
     textTheme: TextTheme(
       displayLarge: GoogleFonts.nunito(
         color: textSwatch.shade700,

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:suitmedia_test/ui/provider/name/name_state_provider.dart';
+import 'package:suitmedia_test/ui/widgets/base_alert_dialog.dart';
+import 'package:suitmedia_test/ui/widgets/base_button_bar.dart';
+import 'package:suitmedia_test/ui/widgets/base_text_field.dart';
 
 class FirstScreen extends ConsumerStatefulWidget {
   static const routePath = "/first-screen";
@@ -11,6 +14,20 @@ class FirstScreen extends ConsumerStatefulWidget {
 }
 
 class _FirstScreenState extends ConsumerState<FirstScreen> {
+  late final GlobalKey<ScaffoldMessengerState> smState;
+
+  bool checkEmptyField(String input, String label) {
+    if (input.isEmpty) {
+      smState.currentState!.showSnackBar(SnackBar(
+        backgroundColor: Colors.red,
+        content: Text(label),
+      ));
+
+      return false;
+    }
+    return true;
+  }
+
   bool isPalindrome(String input) {
     final text = input.toLowerCase().replaceAll(" ", "");
     final textLength = text.length;
@@ -23,37 +40,29 @@ class _FirstScreenState extends ConsumerState<FirstScreen> {
   }
 
   void showIsPalindrome() {
+    if (!checkEmptyField(_palindromeController!.text, "fill the palindrome")) {
+      return;
+    }
     if (isPalindrome(_palindromeController!.text)) {
       showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-                title: const Text("isPalindrome"),
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("OK"))
-                ],
-              ));
-    } else {
-      showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-                title: const Text("not palindrome"),
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("OK"))
-                ],
-              ));
+          builder: (context) => const BaseAlertDialog(title: "isPalindrome"));
+      return;
     }
+    showDialog(
+        context: context,
+        builder: (context) => const BaseAlertDialog(title: "not palindrome"));
+    return;
   }
 
   void goToNextPage() {
-    ref.read(nameProvider.notifier).state = _nameController!.text;
+    final nameText = _nameController!.text.replaceAll(" ", "");
+    if (!checkEmptyField(nameText, "fill the name")) {
+      return;
+    }
+    ref.read(nameProvider.notifier).state = nameText;
     Navigator.pushNamed(context, "/second-screen");
   }
-
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   TextEditingController? _nameController;
   TextEditingController? _palindromeController;
@@ -64,6 +73,7 @@ class _FirstScreenState extends ConsumerState<FirstScreen> {
     super.initState();
     _nameController = TextEditingController();
     _palindromeController = TextEditingController();
+    smState = GlobalKey<ScaffoldMessengerState>();
   }
 
   @override
@@ -72,93 +82,65 @@ class _FirstScreenState extends ConsumerState<FirstScreen> {
     super.dispose();
     _nameController?.dispose();
     _palindromeController?.dispose();
+    smState.currentState?.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage("assets/images/background_1.png"),
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(48),
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle, color: Colors.white.withOpacity(0.5)),
-              child: const Center(
-                  child: Icon(
-                Icons.person_add_alt_1,
-                size: 32,
-                color: Colors.white,
-              )),
-            ),
-            const SizedBox(height: 40),
-            _buildTextField(label: "Name", controller: _nameController),
-            const SizedBox(height: 16),
-            _buildTextField(
-                label: "Palindrome", controller: _palindromeController),
-            const SizedBox(height: 40),
-            _buildButton(context, label: "Check", onPressed: showIsPalindrome),
-            const SizedBox(
-              height: 16,
-            ),
-            _buildButton(context, label: "Next", onPressed: goToNextPage),
-          ],
-        ),
-      ),
-    ));
-  }
-
-  Widget _buildTextField(
-      {required String label, TextEditingController? controller}) {
-    return TextFormField(
-      controller: controller,
-      onChanged: (value) {
-        isPalindrome(value);
-      },
-      decoration: InputDecoration(
-          hintText: label,
-          hintStyle: const TextStyle(color: Colors.grey),
-          fillColor: Colors.white,
-          filled: true,
-          border: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(16)),
-            borderSide: BorderSide.none,
-          ),
-          isDense: true),
-      style: TextStyle(color: Colors.grey.shade800),
-    );
-  }
-
-  Widget _buildButton(BuildContext context,
-      {required String label, required VoidCallback? onPressed}) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return InkWell(
-        onTap: onPressed,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: colorScheme.primary),
-          child: Center(
-            child: Text(
-              label.toUpperCase(),
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+    return ScaffoldMessenger(
+        key: smState,
+        child: Scaffold(
+          body: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(24),
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/images/background_1.png"),
+                fit: BoxFit.cover,
               ),
             ),
+            child: LayoutBuilder(builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                      minWidth: constraints.maxWidth),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(48),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withOpacity(0.5)),
+                          child: const Center(
+                              child: Icon(
+                            Icons.person_add_alt_1,
+                            size: 32,
+                            color: Colors.white,
+                          )),
+                        ),
+                        const SizedBox(height: 40),
+                        BaseTextField(
+                            label: "Name", controller: _nameController),
+                        const SizedBox(height: 16),
+                        BaseTextField(
+                            label: "Palindrome",
+                            controller: _palindromeController),
+                        const SizedBox(height: 40),
+                        BaseButtonBar(
+                            label: "CHECK", onPressed: showIsPalindrome),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        BaseButtonBar(label: "NEXT", onPressed: goToNextPage),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
           ),
         ));
   }

@@ -16,8 +16,6 @@ class ThirdScreen extends ConsumerStatefulWidget {
 class _ThirdScreenState extends ConsumerState<ThirdScreen> {
   final ScrollController _scrollController = ScrollController();
 
-  bool isEmptyData = false;
-
   @override
   void dispose() {
     // TODO: implement dispose
@@ -28,15 +26,7 @@ class _ThirdScreenState extends ConsumerState<ThirdScreen> {
   bool _onEndScroll(scrollNotification) {
     if (scrollNotification is ScrollEndNotification &&
         _scrollController.position.extentAfter == 0) {
-      ref.read(userNotifierProvider.notifier).loadMore().then((value) {
-        setState(() {
-          isEmptyData = !value;
-        });
-        if (!value) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("No more data to load")));
-        }
-      });
+      ref.read(userNotifierProvider.notifier).loadMore();
     }
     return false;
   }
@@ -56,14 +46,12 @@ class _ThirdScreenState extends ConsumerState<ThirdScreen> {
                   child: Text("No Data"),
                 );
               } else {
-                return NotificationListener<ScrollNotification>(
-                  onNotification: _onEndScroll,
-                  child: RefreshIndicator(
-                    onRefresh: () async {
-                      await ref
-                          .refresh(userNotifierProvider.notifier)
-                          .getUsers();
-                    },
+                final isExists =
+                    ref.read(userNotifierProvider.notifier).isExist;
+                return _refreshWrapper(
+                  isScroll: false,
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: _onEndScroll,
                     child: SingleChildScrollView(
                       controller: _scrollController,
                       physics: const BouncingScrollPhysics(),
@@ -79,7 +67,7 @@ class _ThirdScreenState extends ConsumerState<ThirdScreen> {
                             },
                             itemCount: data.length,
                           ),
-                          !isEmptyData
+                          isExists
                               ? Container(
                                   padding: const EdgeInsets.all(16),
                                   alignment: Alignment.center,
@@ -93,11 +81,38 @@ class _ThirdScreenState extends ConsumerState<ThirdScreen> {
                 );
               }
             },
-            error: (e, s) => Center(
+            error: (e, s) {
+              return _refreshWrapper(
+                child: Center(
                   child: Text("Error => $e"),
                 ),
-            loading: () => const Center(
-                  child: CircularProgressIndicator(),
+              );
+            },
+            loading: () => _refreshWrapper(
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 )));
+  }
+
+  Widget _refreshWrapper({required Widget child, bool isScroll = true}) {
+    return RefreshIndicator(
+        onRefresh: () => ref.refresh(userNotifierProvider.notifier).getUsers(),
+        child: isScroll
+            ? LayoutBuilder(
+                builder: (context, constraints) => SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                            minWidth: constraints.maxWidth),
+                        child: IntrinsicHeight(
+                            child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [const Spacer(), child, const Spacer()],
+                        )),
+                      ),
+                    ))
+            : child);
   }
 }

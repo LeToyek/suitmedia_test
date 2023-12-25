@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:suitmedia_test/domain/model/user_model.dart';
 import 'package:suitmedia_test/domain/repository/user_repository.dart';
@@ -15,6 +16,7 @@ class UserNotifier extends StateNotifier<AsyncValue<List<UserModel>>> {
         );
 
   int _page = 1;
+  bool isExist = true;
 
   Future<void> getUsers() async {
     try {
@@ -25,18 +27,24 @@ class UserNotifier extends StateNotifier<AsyncValue<List<UserModel>>> {
     }
   }
 
-  Future<bool> loadMore() async {
+  Future<void> loadMore() async {
     try {
       _page++;
-      final users = await _userRepository.getUsers(_page, 10);
-      if (users.isEmpty) {
-        return false;
+      final res = await _userRepository.getUsers(_page, 10);
+      isExist = res.isNotEmpty;
+      state = AsyncValue.data([...state.value!, ...res]);
+    } on DioException catch (e) {
+      String message = "";
+      switch (e.type) {
+        case DioExceptionType.connectionError:
+          message = "No Internet Connection";
+          break;
+        default:
+          message = "Something went wrong";
       }
-      state = AsyncValue.data([...state.value!, ...users]);
-      return true;
+      state = AsyncValue.error(message, StackTrace.current);
     } catch (e) {
       state = AsyncValue.error(e, StackTrace.current);
-      rethrow;
     }
   }
 
